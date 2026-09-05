@@ -1,27 +1,83 @@
+# Particle Swarm Optimization for Economic Dispatch
 
-\[
-30 \leq P_1 \leq 100
-\]
+## Overview
+
+This project applies **Particle Swarm Optimization (PSO)** to a simple Economic Dispatch problem. The objective is to distribute an electricity demand between two generators while minimizing the total operating cost.
+
+## Problem Statement
+
+Two generators must satisfy a total electricity demand of **150 MW**.
+
+The solution must:
+
+- Meet the total demand.
+- Respect each generator's minimum and maximum operating limits.
+- Minimize the combined operating cost.
+
+The total power generated must equal the total demand:
+
+```text
+P1 + P2 = 150
+```
+
+Where:
+
+- `P1` is the power produced by Generator 1.
+- `P2` is the power produced by Generator 2.
+
+Once `P1` is selected, calculate Generator 2 output as:
+
+```text
+P2 = 150 - P1
+```
+
+Example: if `P1 = 80`, then `P2 = 150 - 80 = 70`.
+
+## Generator Constraints
+
+| Generator | Minimum Output | Maximum Output |
+|---|---:|---:|
+| Generator 1 | 20 MW | 100 MW |
+| Generator 2 | 30 MW | 120 MW |
+
+Because `P2 = 150 - P1`, the valid search range for `P1` is:
+
+```text
+30 <= P1 <= 100
+```
 
 ## Cost Functions
 
-Generator 1 operating cost:
+Generator 1 cost is calculated from its generated power:
 
-\[
-C_1(P_1) = 0.01P_1^2 + 2P_1 + 10
-\]
+```text
+C1 = 0.01 * P1**2 + 2 * P1 + 10
+```
 
-Generator 2 operating cost:
+Generator 2 cost is calculated the same way:
 
-\[
-C_2(P_2) = 0.015P_2^2 + 1.8P_2 + 15
-\]
+```text
+C2 = 0.015 * P2**2 + 1.8 * P2 + 15
+```
 
-The optimization objective is:
+The total cost is the sum of both costs:
 
-\[
-\min C_{total} = C_1(P_1) + C_2(P_2)
-\]
+```text
+total_cost = C1 + C2
+```
+
+The goal is to find the values of `P1` and `P2` that produce the **smallest `total_cost`**.
+
+### Calculation Example
+
+For `P1 = 80`:
+
+```text
+P2 = 150 - 80 = 70
+C1 = 0.01 * 80**2 + 2 * 80 + 10 = 234
+C2 = 0.015 * 70**2 + 1.8 * 70 + 15 = 214.5
+total_cost = 234 + 214.5 = 448.5
+```
 
 ## PSO Design
 
@@ -41,15 +97,18 @@ The swarm also keeps:
 
 ### Velocity Update
 
-\[
-v_{new} = wv_{old} + c_1r_1(pbest - x) + c_2r_2(gbest - x)
-\]
+```text
+new_velocity =
+    (w * current_velocity)
+    + (c1 * r1 * (personal_best_position - current_position))
+    + (c2 * r2 * (global_best_position - current_position))
+```
 
 ### Position Update
 
-\[
-x_{new} = x_{old} + v_{new}
-\]
+```text
+new_position = current_position + new_velocity
+```
 
 Suggested starting parameters:
 
@@ -77,15 +136,16 @@ After running the program, it should print:
 
 For this example, the expected optimal distribution is approximately:
 
-\[
-P_1 \approx 86\text{ MW}, \qquad P_2 \approx 64\text{ MW}
-\]
+```text
+P1 ≈ 86 MW
+P2 ≈ 64 MW
+```
 
 with a total cost close to:
 
-\[
-C_{total} \approx 447.6
-\]
+```text
+total_cost ≈ 447.6
+```
 
 ## Learning Goals
 
